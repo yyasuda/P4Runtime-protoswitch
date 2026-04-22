@@ -1,4 +1,4 @@
-## Tutorial 2: Header Interpretation (Parsing)
+## Tutorial 2: Header Parsing (Interpretation)
 
 In general, switches and routers determine the forwarding destination based on the information contained in packet headers. In other words, it is necessary to interpret (parse) each field of the packet header. Here, we perform header parsing and try a switch program, `macaddr.p4`, that determines the forwarding destination based on the MAC address.
 
