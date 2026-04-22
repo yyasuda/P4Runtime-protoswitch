@@ -2,6 +2,8 @@
 
 An ultimately primitive P4Runtime tutorial for beginners in P4.
 
+[see Japanese version](docs_ja/README.md)
+
 ## Introduction
 
 The code and data in this repository were created as a tutorial to provide a simple entry point for those who want to try controlling a P4 switch using P4Runtime for the first time. It assumes that the reader has some basic understanding of P4 and P4Runtime. It is intended to serve as a good starting point for those who are trying it hands-on for the first time.
