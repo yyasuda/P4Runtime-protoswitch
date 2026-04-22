@@ -167,4 +167,4 @@ You can also check the Valid state using the `isValid()` function. You might thi
 
 ## Next Step
 
-#### Tutorial 3: [Adding entries to a table](t3_add-entry.md)
+#### Tutorial 3: [Adding Entries to a Table](t3_add_entry.md)
