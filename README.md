@@ -58,7 +58,7 @@ We perform a forwarding experiment using an extremely simple switch program, por
 
 Here, we parse (interpret) headers and use a switch program, macaddr.p4, that determines the forwarding destination based on the extracted destination MAC address field.
 
-### Tutorial 3: [Adding entries to a table](t3_add-entry.md)
+### Tutorial 3: [Adding entries to a table](t3_add_entry.md)
 
 P4 has something called a Match-Action Table, which allows applying necessary processing (actions) per packet. Here, we use a switch program, tablematch.p4, where the forwarding destination is determined by a table keyed by destination MAC address.
 
