@@ -1,4 +1,4 @@
-## Tutorial 2: ヘッダの解釈（パース）
+## Tutorial 2: ヘッダのパース（解釈）
 
 一般にスイッチやルータはパケットのヘッダの中にある情報によって転送先を決定します。つまりパケットヘッダの各フィールドを解釈（パース）する必要があります。ここではヘッダのパースを行い、MACアドレスによって転送先を決定するスイッチプログラム、macaddr.p4 を試します。
 
@@ -168,5 +168,5 @@ control MyDeparser(packet_out packet, in headers hdr) {
 
 ## Next Step
 
-#### Tutorial 3: [テーブルへのエントリ追加](t3_add-entry.md)
+#### Tutorial 3: [テーブルへのエントリ追加](t3_add_entry.md)
 
