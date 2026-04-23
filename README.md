@@ -35,14 +35,13 @@ All experiments in this tutorial are performed in a Docker environment.
 #### P4Runtime-enabled Mininet Docker Image (modified)
 
 - Docker Hub: [yutakayasuda/p4mn](https://hub.docker.com/r/yutakayasuda/p4mn) 
-- GitHub: [opennetworkinglab/p4mn-docker](https://github.com/opennetworkinglab/p4mn-docker)
+- GitHub: [yyasuda/p4mn-docker](https://github.com/yyasuda/p4mn-docker)
 
 The original [opennetworking/p4mn](https://hub.docker.com/r/opennetworking/p4mn) also works almost the same, but since handling logs was not very convenient, a modified version was created.
 
 #### P4Runtime Shell
 
 - Docker Hub:  [P4Runtime Shell](https://hub.docker.com/r/p4lang/p4runtime-sh)
-- GitHub: [yyasuda/p4runtime-shell](https://github.com/yyasuda/p4runtime-shell)
 
 ## Step by Step
 

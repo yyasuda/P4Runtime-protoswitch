@@ -32,14 +32,13 @@ P4 初学者のための、極端なほど原始的な P4Runtime チュートリ
 #### P4Runtime-enabled Mininet Docker Image (modified)
 
 - Docker Hub: [yutakayasuda/p4mn](https://hub.docker.com/r/yutakayasuda/p4mn) 
-- GitHub: [opennetworkinglab/p4mn-docker](https://github.com/opennetworkinglab/p4mn-docker)
+- GitHub: [yyasuda/p4mn-docker](https://github.com/yyasuda/p4mn-docker)
 
 オリジナルの [opennetworking/p4mn](https://hub.docker.com/r/opennetworking/p4mn) でもほとんど同じように動作しますが、ログなどの扱いがあまりうまくできないので自分で作りました。
 
 #### P4Runtime Shell
 
 - Docker Hub:  [P4Runtime Shell](https://hub.docker.com/r/p4lang/p4runtime-sh)
-- GitHub: [yyasuda/p4runtime-shell](https://github.com/yyasuda/p4runtime-shell)
 
 ## Step by Step
 
