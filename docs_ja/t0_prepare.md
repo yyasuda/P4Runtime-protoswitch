@@ -55,10 +55,10 @@ h1 がスイッチにつながれているインタフェイス h1-eth0 の MAC 
 
 #### ログデータ
 
-Mininet 起動時に与えた ```-e LOGLEVEL=debug -e PKTDUMP=true -e ``` オプションによって、Mininet コンテナの /tmp ディレクトリ以下にログファイルができていることがわかるでしょう。なお、Mininet におけるコマンド指示は、最初にホスト名を指定し、その後に指定したホストで実行するコマンドを記述するようになっています。つまり ```mininet> s1 ls -l /tmp``` は、スイッチ（のOS）上で ```ls -l /tmp``` を実行しているのです。
+Mininet 起動時に与えた ```-e LOGLEVEL=debug -e PKTDUMP=true -e ``` オプションによって、Mininet コンテナの /tmp ディレクトリ以下にログファイルができていることがわかるでしょう。なお Mininet のコマンドの一つに sh があり、これはそれ以降の記述を sh コマンドシェルに渡して実行させます。
 
 ```bash
-mininet> s1 ls -l /tmp
+mininet> sh ls -l /tmp
 total 16
 -rw-r--r-- 1 root root    5 Apr 24 10:59 bmv2-s1-grpc-port
 -rw-r--r-- 1 root root 1073 Apr 24 10:59 bmv2-s1-log
