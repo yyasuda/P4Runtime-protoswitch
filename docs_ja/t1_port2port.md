@@ -14,52 +14,51 @@ PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
 --- 10.0.0.2 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 12.384/12.384/12.384/0.000 ms
-mininet> s1 ls -l /tmp
-total 36
--rw-r--r-- 1 root root    5 Apr 19 06:48 bmv2-s1-grpc-port
--rw-r--r-- 1 root root 4645 Apr 19 06:48 bmv2-s1-log
--rw-r--r-- 1 root root 1095 Apr 19 06:48 bmv2-s1-netcfg.json
--rw-r--r-- 1 root root   32 Apr 19 06:48 bmv2-s1-watchdog.out
--rw-r--r-- 1 root root  138 Apr 19 06:48 s1-eth1_in.pcap
--rw-r--r-- 1 root root  138 Apr 19 06:48 s1-eth1_out.pcap
--rw-r--r-- 1 root root  138 Apr 19 06:48 s1-eth2_in.pcap
--rw-r--r-- 1 root root  138 Apr 19 06:48 s1-eth2_out.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:48 s1-eth3_in.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:48 s1-eth3_out.pcap
-mininet>
+mininet> 
 ```
 
 上に示した ```mininet> h1 ping -c 1 h2 ``` は、ホスト h1 上で ```ping -c 1 h2``` を、つまり一度だけ h2 に向けた ping を行っているのです。12.4m秒で返事が届いていますね。
 
-ping の実行後にログファイルのサイズを見ると、h1, h2 に接続されたポート eth1, eth2 にログが書き込まれてファイルサイズが増えていることがわかります。
+/tmp ディレクトリ以下には各種のログが出力されています。
+
+```bash
+mininet> s1 ls -l /tmp
+total 36
+-rw-r--r-- 1 root root    5 Apr 24 05:54 bmv2-s1-grpc-port
+-rw-r--r-- 1 root root 4657 Apr 24 05:56 bmv2-s1-log
+-rw-r--r-- 1 root root 1095 Apr 24 05:54 bmv2-s1-netcfg.json
+-rw-r--r-- 1 root root   32 Apr 24 05:54 bmv2-s1-watchdog.out
+-rw-r--r-- 1 root root  138 Apr 24 05:56 s1-eth1_in.pcap
+-rw-r--r-- 1 root root  138 Apr 24 05:56 s1-eth1_out.pcap
+-rw-r--r-- 1 root root  138 Apr 24 05:56 s1-eth2_in.pcap
+-rw-r--r-- 1 root root  138 Apr 24 05:56 s1-eth2_out.pcap
+-rw-r--r-- 1 root root    0 Apr 24 05:54 s1-eth3_in.pcap
+-rw-r--r-- 1 root root    0 Apr 24 05:54 s1-eth3_out.pcap
+mininet>
+```
+
+bmv2-s1-log にはかなり細かなスイッチの挙動が記録されています。このチュートリアルでは詳細については説明しません。ping 実験の後にファイルサイズを確認すると、上記のように h1, h2 に接続されたポートである s1-eth1, s1-eth2 にログが書き込まれてファイルサイズが増えていることがわかります。
 
 #### ログの確認
 
-それぞれのログファイルの中身を見てみましょう。
+s1-eth1_in.pcap ファイルの中身を見てみましょう。
 
 ```bash
 mininet> s1 tcpdump -n -r s1-eth1_in.pcap 
 reading from file s1-eth1_in.pcap, link-type EN10MB (Ethernet), snapshot length 262144
 06:48:51.979680 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 105, seq 1, length 64
-mininet> s1 tcpdump -n -r s1-eth1_out.pcap 
-reading from file s1-eth1_out.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-06:48:51.991974 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 105, seq 1, length 64
-mininet> s1 tcpdump -n -r s1-eth2_in.pcap 
-reading from file s1-eth2_in.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-06:48:51.991650 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 105, seq 1, length 64
-mininet> s1 tcpdump -n -r s1-eth2_out.pcap 
-reading from file s1-eth2_out.pcap, link-type EN10MB (Ethernet), snapshot length 262144
-06:48:51.991104 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 105, seq 1, length 64
 mininet> 
 ```
 
-ファイル名順に出したので内容が把握しにくくなっています。結果をタイムスタンプ順に並べ直して整形してみます。
+すべての pcap ログファイルについて上記の方法で内容を表示させ、それをタイムスタンプ順に並べるシェルスクリプト、dump-pcaps を用意しています。以下のようにして実行できます。
 
 ```bash
-eth1_in  06:48:51.979680 IP 10.0.0.1 > 10.0.0.2: ICMP echo request
-eth2_out 06:48:51.991104 IP 10.0.0.1 > 10.0.0.2: ICMP echo request
-eth2_in  06:48:51.991650 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply
-eth1_out 06:48:51.991974 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply
+mininet> sh dump-pcaps
+eth1_in  5:56:56.595130 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 108, seq 1, length 64
+eth2_out 5:56:56.597296 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 108, seq 1, length 64
+eth2_in  5:56:56.598175 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 108, seq 1, length 64
+eth1_out 5:56:56.598834 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 108, seq 1, length 64
+mininet> 
 ```
 
 これで以下のようなパケットの動きがあったことが分かるでしょうか。
@@ -68,6 +67,7 @@ eth1_out 06:48:51.991974 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply
 2. このパケットは s1 の eth2 ポートから出力（転送）された（その結果 h2 に届いた）
 3. （h2 がそれに反応して送り出された返事である） ICMP echo response パケットを s1 の eth2 ポートに入ってきた
 4. このパケットは s1 の eth1 ポートから出力（転送）された（その結果 h1 に届いた）
+
 
 ### port2port.p4 プログラムの内容
 

@@ -46,7 +46,7 @@ P4 初学者のための、極端なほど原始的な P4Runtime チュートリ
 
 ### Tutorial 0: [実験環境の準備](t0_prepare.md)
 
-実験に先だって、P4 スイッチプログラムのコンパイルが必要です。次にMininetを起動し、そこにコントローラ代わりとなる、P4 Runtime Shell を接続させます。
+実験は Mininet を起動し、そこにコントローラ代わりとなる P4 Runtime Shell を接続させて行います。
 
 ### Tutorial 1: [最も単純なスイッチ](t1_port2port.md)
 
