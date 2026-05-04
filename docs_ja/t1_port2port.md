@@ -54,10 +54,10 @@ mininet>
 
 ```bash
 mininet> sh dump_pcaps
-eth1_in  5:56:56.595130 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 108, seq 1, length 64
-eth2_out 5:56:56.597296 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 108, seq 1, length 64
-eth2_in  5:56:56.598175 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 108, seq 1, length 64
-eth1_out 5:56:56.598834 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 108, seq 1, length 64
+s1-eth1_in  5:56:56.595130 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 108, seq 1, length 64
+s1-eth2_out 5:56:56.597296 IP 10.0.0.1 > 10.0.0.2: ICMP echo request, id 108, seq 1, length 64
+s1-eth2_in  5:56:56.598175 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 108, seq 1, length 64
+s1-eth1_out 5:56:56.598834 IP 10.0.0.2 > 10.0.0.1: ICMP echo reply, id 108, seq 1, length 64
 mininet> 
 ```
 
@@ -67,6 +67,10 @@ mininet>
 2. このパケットは s1 の eth2 ポートから出力（転送）された（その結果 h2 に届いた）
 3. （h2 がそれに反応して送り出された返事である） ICMP echo response パケットを s1 の eth2 ポートに入ってきた
 4. このパケットは s1 の eth1 ポートから出力（転送）された（その結果 h1 に届いた）
+
+##### dump_pcaps スクリプトの Tips
+
+このプログラムは「前回、最後に出力したログから増えたぶん」だけ出力するように作られています。もし Mininet を起動して以来のすべてのログを表示したい場合は `dump_pcaps -all` としてください。
 
 
 ### port2port.p4 プログラムの内容
