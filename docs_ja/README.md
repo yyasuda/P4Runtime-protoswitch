@@ -25,20 +25,20 @@ P4 初学者のための、極端なほど原始的な P4Runtime チュートリ
 
 このチュートリアルではすべて Docker 環境で実験を行います。
 
-#### P4C
-
-- Docker Hub: [p4lang/p4c](https://hub.docker.com/r/p4lang/p4c) 
-
 #### P4Runtime-enabled Mininet Docker Image (modified)
 
 - Docker Hub: [yutakayasuda/p4mn](https://hub.docker.com/r/yutakayasuda/p4mn) 
 - GitHub: [yyasuda/p4mn-docker](https://github.com/yyasuda/p4mn-docker)
 
-オリジナルの [opennetworking/p4mn](https://hub.docker.com/r/opennetworking/p4mn) でもほとんど同じように動作しますが、ログなどの扱いがあまりうまくできないので自分で作りました。
+オリジナルの [opennetworking/p4mn](https://hub.docker.com/r/opennetworking/p4mn) でもほとんど同じように動作しますが、ログなどの扱いがあまりうまくできないので自分で調整しました。
 
 #### P4Runtime Shell
 
 - Docker Hub:  [P4Runtime Shell](https://hub.docker.com/r/p4lang/p4runtime-sh)
+
+#### P4C
+
+- Docker Hub: [p4lang/p4c](https://hub.docker.com/r/p4lang/p4c) 
 
 ## Step by Step
 
@@ -50,15 +50,15 @@ P4 初学者のための、極端なほど原始的な P4Runtime チュートリ
 
 ### Tutorial 1: [最も単純なスイッチ](t1_port2port.md)
 
-port 1 から入ってきたパケットは port 2 へ、port 2 から入ってきたパケットは port 1 へ転送するだけの、極端に単純なスイッチプログラム、port2port.p4 を用いた転送実験を行います。
+port 1 から入ってきたパケットは port 2 へ、port 2 から入ってきたパケットは port 1 へ転送するだけの、極端に単純なスイッチプログラムを用いた転送実験を行います。
 
 ### Tutorial 2: [ヘッダのパース（解釈）](t2_macaddr.md)
 
-ここではヘッダのパース（解釈）を行い、取り出した宛先MACアドレスフィールドの情報によって転送先を決定するスイッチプログラム、macaddr.p4 を試します。
+ここではヘッダのパース（解釈）を行い、取り出した宛先MACアドレスフィールドの情報によって転送先を決定するスイッチプログラムを試します。
 
 ### Tutorial 3: [テーブルへのエントリ追加](t3_add_entry.md)
 
-P4 には Match Action Table と呼ばれるものがあり、これを使ってパケットごとに必要な処理（アクション）を適用することができます。ここでは宛先 MACアドレスをキーとして持つ表によって転送先を決定するスイッチプログラム、tablematch.p4 を試します。
+P4 には Match Action Table と呼ばれるものがあり、これを使ってパケットごとに必要な処理（アクション）を適用することができます。ここでは宛先 MACアドレスをキーとして持つ表によって転送先を決定するスイッチプログラムを試します。
 
 ## Next Step
 
