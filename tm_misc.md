@@ -23,7 +23,7 @@ $
 Start the P4C Docker container as follows.
 
 ```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
+$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c /bin/bash
 root@ab1f99459b1a:/p4c# cd /tmp/test
 root@ab1f99459b1a:/tmp/test# ls
 test.p4
@@ -35,9 +35,9 @@ root@ab1f99459b1a:/tmp/test#
 If you got an error such as **"no matching manifest for linux/arm64/v8 in the manifest list entries"** in the above operation, are you using a Mac with an ARM processor?
 
 ```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
-Unable to find image 'p4lang/p4c:1.2.5.6' locally
-1.2.5.6: Pulling from p4lang/p4c
+$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c /bin/bash
+Unable to find image 'p4lang/p4c:latest' locally
+latest: Pulling from p4lang/p4c
 docker: no matching manifest for linux/arm64/v8 in the manifest list entries
 $
 ```
