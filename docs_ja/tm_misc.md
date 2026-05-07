@@ -23,7 +23,7 @@ $
 以下のようにしてP4C Dockerコンテナを起動します。
 
 ```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
+$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c /bin/bash
 root@ab1f99459b1a:/p4c# cd /tmp/test
 root@ab1f99459b1a:/tmp/test# ls
 test.p4
@@ -35,9 +35,9 @@ root@ab1f99459b1a:/tmp/test#
 上の操作で **"no matching manifest for linux/arm64/v8 in the manifest list entries"** といったエラーが出た人は ARM プロセッサの Mac を使っているのではありませんか。
 
 ```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
-Unable to find image 'p4lang/p4c:1.2.5.6' locally
-1.2.5.6: Pulling from p4lang/p4c
+$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c /bin/bash
+Unable to find image 'p4lang/p4c:latest' locally
+latest: Pulling from p4lang/p4c
 docker: no matching manifest for linux/arm64/v8 in the manifest list entries
 $
 ```
@@ -64,9 +64,9 @@ root@ab1f99459b1a:/tmp/test#
 
 各チュートリアルに用意されている p4info.txtpb や proto01.json ファイルなどはこのようにして作られたものです。
 
-##### tag:1.2.5.6 を指定しないとエラーになる
+##### libboost_iostreams.so.1.71.0 が足りないとエラーになったら
 
-P4C Dockerコンテナの起動操作では、最新のものを利用せず明示的に tag 1.2.5.6 を指定しています。その理由はこれを書いている時点での latest version では、コンパイルすると以下のようなエラーが出てしまうためです。
+もしコンパイルすると以下のようなエラーが出てしまった場合、あなたのコンテナイメージは 1.2.5.7 から 1.2.5.13 より小さい可能性が高いです。
 
 ```bash
 root@897ac728fb57:/p4c# cd /tmp
@@ -75,7 +75,7 @@ root@897ac728fb57:/tmp# p4c --target bmv2 --arch v1model --p4runtime-files p4inf
 root@897ac728fb57:/tmp#
 ```
 
-どうやら少し前（おそらく Jun 4, 2025 の 1.2.5.7）に過剰にライブラリをパッケージから削ってしまったようで、libboost ライブラリが外れています。先ほど（April 19, 2026）に p4lang に [issue](https://github.com/p4lang/p4c/issues/5593) を出したので近いうちに直るでしょうが、以下のようにして手作業で実行中のコンテナに libboost を追加インストールして対応することもできます。
+どうやら少し前（おそらく Jun 4, 2025 の 1.2.5.7）に過剰にライブラリをパッケージから削ってしまったようで、libboost ライブラリが外れています。先ほど（April 19, 2026）に p4lang に Issue [\#5593](https://github.com/p4lang/p4c/issues/5593) を出したので近いうちに直るでしょうが、以下のようにして手作業で実行中のコンテナに libboost を追加インストールして対応することもできます。（7 May, 2026 に修正のための Pull Request [\#5612](https://github.com/p4lang/p4c/pull/5612) を出して受理され、 1.2.5.13 となって問題は解決しました。）
 
 ```bash
 # apt update 
