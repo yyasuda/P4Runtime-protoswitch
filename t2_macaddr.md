@@ -1,41 +1,34 @@
-## Tutorial 2: Header Parsing (Interpretation)
+## Tutorial 2: Header parsing (Interpretation)
 
-In general, switches and routers determine the forwarding destination based on the information contained in packet headers. In other words, it is necessary to interpret (parse) each field of the packet header. Here, we perform header parsing and try a switch program, `macaddr.p4`, that determines the forwarding destination based on the MAC address.
+In general, switches and routers determine forwarding destinations according to information contained in packet headers. In other words, it is necessary to interpret (parse) each field in the packet header. Here, we perform header parsing and try the switch program `proto02.p4`, which determines the forwarding destination according to the MAC address.
 
 ### Changing the switch program
 
-In Tutorial 1, we ran Mininet using a switch program compiled from `port2port.p4`. Change this to `macaddr.p4` using the following steps.
+In Tutorial 1, the switch was operated by giving Mininet the switch program compiled from `proto01.p4`. Change this to `proto02.p4` using the following procedure.
 
-1. Compile `macaddr.p4` in the P4C container  
-2. Exit the P4Runtime Shell once  
-3. Restart the P4Runtime Shell using the files generated in step 1, and send the program to Mininet  
+1. Exit P4Runtime Shell once
+2. Restart P4Runtime Shell using `proto02.p4`, and send the program into Mininet
 
-Mininet continues running without being stopped, so logs will continue to be appended. If old log data is unnecessary for a new experiment, you may restart Mininet in steps 2 and 3 above.
+Mininet continues running without being terminated, so logs continue to be added. If old log data is unnecessary for a new experiment, it is probably good to restart Mininet between steps 1 and 2 above.
 
 Only the command sequence is shown below.
 
-1. Compile macaddr.p4
-```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
-root@d5da54abaa97:/p4c# cd /tmp
-root@d5da54abaa97:/tmp# p4c --target bmv2 --arch v1model --p4runtime-files macaddr_p4info.txtpb macaddr.p4 
-root@d5da54abaa97:/tmp# 
-```
+1. Exit P4Runtime Shell
 
-2. Exit P4Runtime Shell
 ```bash
 P4Runtime sh >>> exit
 $
 ```
 
-3. Restart P4Runtime Shell
+2. Restart P4Runtime Shell
+
 ```bash
-$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/macaddr_p4info.txtpb,/tmp/macaddr.json
+$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/proto02/p4info.txtpb,/tmp/proto02/proto02.json
 ....
 P4Runtime sh >>>
 ```
 
-### Communication Experiment
+### Communication experiment
 
 On the Mininet side, try sending a ping from h1 to h2 as follows.
 
@@ -52,19 +45,19 @@ mininet>
 
 If you examine the log files, you will observe that packets are forwarded in exactly the same way as in Tutorial 0.
 
-### Contents of the macaddr.p4 Program
+### Contents of the `proto02.p4` program
 
-Such packet forwarding occurs because that kind of packet control is written in the switch program sent to the Mininet switch. Let us examine the contents of the P4 program.
+Such packet forwarding took place because such packet forwarding control is written in the switch program sent to the Mininet switch. Let us examine the contents of the P4 program.
 
 #### Header definitions and parser
 
-Compared to `port2port.p4`, definitions of packet headers have been added at the beginning. Structure variables corresponding to the Ethernet header and IPv4 header are written (note that the type name is `header`, not `struct`).
+Compared to `proto01.p4`, definitions of packet headers have been added at the beginning. Structure variables corresponding to the Ethernet header and IPv4 header are written (note that the type name is `header`, not `struct`).
 
 Following that, processing is described inside the `MyParser()` function to map these header definitions onto the packet. Such parsing processing is sometimes written as a state machine, and in P4 it is indeed described as definitions of states such as `state xxxx { ... }`.
 
 When a packet enters the switch, the `MyParser()` function is called, and the initial state is `start`. This is defined as `state start { ... }`, and it is written that it transitions unconditionally to the `parse_ethernet` state. As parsing proceeds, contents are extracted into header structure variables by `extract()`, and depending on the values, it transitions to appropriate next states, eventually reaching `accept` and terminating.
 
-````c++
+```c++
 / --- headers ---
 header ethernet_t {            <<<< Definition of Ethernet header
     ....(snip)
@@ -97,11 +90,11 @@ parser MyParser(packet_in packet, out headers hdr, inout metadata meta,
         transition accept;            <<<< End parsing here
     }
 }
-````
+```
 
 #### Ingress processing
 
-After parsing is completed, the `MyIngress()` function is called. In `port2port.p4`, the output destination was determined by the input port information in `standard_metadata`, but in `macaddr.p4`, the destination is determined by the value of `dstAddr` in the `ethernet` structure extracted during parsing, that is, the destination MAC address.
+When parsing processing finishes, the `MyIngress()` function is called. In `proto01.p4`, the forwarding destination was set using the input port information in `standard_metadata`, but in `proto02.p4`, the forwarding destination is set according to the value of the `dstAddr` member of the `ethernet` structure extracted by parsing processing, that is, the destination MAC address.
 
 ```c++
 control MyIngress(inout headers hdr, inout metadata meta,
@@ -126,7 +119,7 @@ control MyIngress(inout headers hdr, inout metadata meta,
 
 #### Deparser processing
 
-Looking at the subsequent `MyDeparser()` function, the `emit()` function is executed. This is one of the somewhat unusual descriptions in P4 and requires some explanation.
+Looking at the subsequent `MyDeparser()` function, the `emit()` function is executed. This is one of the somewhat tricky notations in P4 and requires some explanation.
 
 In P4, a packet that enters the switch is divided into a “header” and a “body” during parsing. The header is extracted into several structure variables that are members of `headers`, and thereafter they are referenced and updated by their variable names (e.g., `hdr.ethernet.dstAddr`) in the P4 program. On the other hand, the body is stored in the switch buffer and is finally combined with the (possibly modified) header and output as a single packet. The portion extracted by `extract()` in the parser becomes the header, and the portion not extracted at the point of `accept()` is treated as the body.
 
@@ -167,4 +160,4 @@ You can also check the Valid state using the `isValid()` function. You might thi
 
 ## Next Step
 
-#### Tutorial 3: [Adding Entries to a Table](t3_add_entry.md)
+#### Tutorial 3: [Adding entries to a table](t3_add_entry.md)

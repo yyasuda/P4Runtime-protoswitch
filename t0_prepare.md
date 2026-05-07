@@ -1,94 +1,20 @@
-## Tutorial 0: Preparation of the Experimental Environment
+## Tutorial 0: Preparing the experimental environment
 
-Before starting the experiments, you need to compile the P4 switch program. Using that, you will start Mininet and connect the P4Runtime Shell, which acts as the controller.
+In this tutorial, experiments are performed by starting Mininet and connecting P4 Runtime Shell, which acts as the controller, to it.
 
-### Compiling the P4 Program
+### System structure
 
-#### Creating a workspace and copying files
-
-Create a working directory `/tmp/P4Runtime-protoswitch` and copy the P4 programs in this tutorial into it.
-
-```bash
-$ mkdir /tmp/P4Runtime-protoswitch
-$ cp port2port.p4 macaddr.p4 tablematch.p4 /tmp/P4Runtime-protoswitch
-$ ls /tmp/P4Runtime-protoswitch
-macaddr.p4	port2port.p4	tablematch.p4
-$
-```
-
-#### Starting the P4C container
-
-Start the P4C Docker container as follows:
-
-```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
-root@897ac728fb57:/p4c#
-```
-
-##### Note for ARM Mac
-
-If you see an error such as **"no matching manifest for linux/arm64/v8 in the manifest list entries"**, you are likely using a Mac with an ARM processor.
-
-```bash
-$ docker run -it -v /tmp/P4Runtime-protoswitch/:/tmp/ p4lang/p4c:1.2.5.6 /bin/bash
-Unable to find image 'p4lang/p4c:1.2.5.6' locally
-latest: Pulling from p4lang/p4c
-docker: no matching manifest for linux/arm64/v8 in the manifest list entries
-$
-```
-
-To run P4C (and P4Runtime Shell) on an ARM Mac, you currently need to enable Rosetta. In Docker Desktop settings → General → Virtual Machine Options, enable “Use Rosetta for x86_64/amd64 emulation on Apple Silicon”. Then add the platform option to the docker command like:
-
-```bash
-$ docker run --platform=linux/amd64 ...
-```
-
-#### Compiling with P4C
-
-Note that the host directory `/tmp/P4Runtime-protoswitch` is synchronized with `/tmp` inside the container.
-
-From the p4c container, the files should be visible under `/tmp`. Compile `port2port.p4` as follows:
-
-```bash
-root@897ac728fb57:/p4c# pwd
-/p4c
-root@897ac728fb57:/p4c# cd /tmp
-root@897ac728fb57:/tmp# ls
-macaddr.p4  port2port.p4  tablematch.p4
-root@7131e7655bba:/tmp# p4c --target bmv2 --arch v1model --p4runtime-files port2port_p4info.txtpb port2port.p4
-root@7131e7655bba:/tmp# ls
-macaddr.p4  port2port.json  port2port.p4  port2port.p4i  port2port_p4info.txtpb  tablematch.p4
-root@7131e7655bba:/tmp#
-```
-
-You will later use the generated `port2port_p4info.txtpb` and `port2port.json` to start the P4Runtime Shell.
-
-##### Why tag 1.2.5.6 is specified
-
-Instead of using the latest image, tag `1.2.5.6` is explicitly specified. This is because the latest version currently produces an error like:
-
-```bash
-/usr/local/bin/p4c-bm2-ss: error while loading shared libraries: libboost_iostreams.so.1.71.0: cannot open shared object file
-```
-
-It seems that around version 1.2.5.7 (Jun 4, 2025), some required libraries were removed. As a workaround, you can install libboost manually:
-
-```bash
-# apt update
-# apt install -y libboost-iostreams1.71.0
-```
-
-### System Configuration
-
-The system configuration is as follows. A 3-port switch is created in Mininet, and P4Runtime Shell is used as the controller.
+The system structure of the environment used in this experiment is shown in the figure below. The switch is prepared as a 3-port switch using a Mininet environment. P4Runtime Shell is used in the role of the controller.
 
 <img src="./t0_structure.png" alt="attach:(system structure)" title="System Structure" width="500">
 
-P4Runtime connects the controller and switch via gRPC. At Mininet startup, a TCP port (50001) is specified. When starting P4Runtime Shell, specify the IP address and port of the Mininet environment. When started, the P4Runtime Shell installs the P4 program specified at startup onto the switch via the gRPC connection.
+In P4Runtime, the controller and the switch are connected using gRPC. When starting Mininet, the port number (TCP 5000) for connection using gRPC is specified. When starting P4Runtime Shell, the IP address and port number of the Mininet environment to be connected are specified. When P4Runtime Shell is started, it similarly installs the P4 program specified at startup into the switch through the gRPC connection.
+
+The concrete procedure is shown below.
 
 ### Starting Mininet
 
-Here, we use the [P4Runtime-enabled Mininet Docker Image](https://hub.docker.com/repository/docker/yutakayasuda/p4mn) as the switch. You can start it as follows.
+Here, [P4Runtime-enabled Mininet Docker Image](https://hub.docker.com/repository/docker/yutakayasuda/p4mn) is used as the switch. It is probably good to start it as follows.
 
 Start a P4Runtime-enabled Mininet environment in a Docker environment. Note that the `--arp` and `--mac` options are specified at startup so that ping tests and similar operations can be performed without ARP processing.
 
@@ -127,41 +53,70 @@ mininet>
 
 The MAC address of the interface h1-eth0, which connects h1 to the switch, is 00:00:00:00:00:01. Similarly, h2 has 00:00:00:00:00:02, and h3 has 00:00:00:00:00:03.
 
-##### Output of log data
+##### Log data
 
-From the options `-e LOGLEVEL=debug -e PKTDUMP=true` specified at Mininet startup, you can see that log files are created under the `/tmp` directory in the Mininet container. Commands in Mininet are executed by first specifying the host name, followed by the command to run on that host. In other words, `mininet> s1 ls -l /tmp` executes `ls -l /tmp` on the switch (its OS).
+From the options `-e LOGLEVEL=debug -e PKTDUMP=true` specified at Mininet startup, you can see that log files are created under the `/tmp` directory in the Mininet container. Mininet has a command called sh, and this passes the following description to the sh command shell for execution.
 
 ```bash
-mininet> s1 ls -l /tmp
+mininet> sh ls -l /tmp
 total 16
--rw-r--r-- 1 root root    5 Apr 19 06:27 bmv2-s1-grpc-port
--rw-r--r-- 1 root root  627 Apr 19 06:27 bmv2-s1-log
--rw-r--r-- 1 root root 1095 Apr 19 06:27 bmv2-s1-netcfg.json
--rw-r--r-- 1 root root   32 Apr 19 06:27 bmv2-s1-watchdog.out
--rw-r--r-- 1 root root    0 Apr 19 06:27 s1-eth1_in.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:27 s1-eth1_out.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:27 s1-eth2_in.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:27 s1-eth2_out.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:27 s1-eth3_in.pcap
--rw-r--r-- 1 root root    0 Apr 19 06:27 s1-eth3_out.pcap
-mininet>
+-rw-r--r-- 1 root root    5 Apr 24 10:59 bmv2-s1-grpc-port
+-rw-r--r-- 1 root root 1073 Apr 24 10:59 bmv2-s1-log
+-rw-r--r-- 1 root root 1095 Apr 24 10:59 bmv2-s1-netcfg.json
+-rw-r--r-- 1 root root   32 Apr 24 10:59 bmv2-s1-watchdog.out
+-rw-r--r-- 1 root root    0 Apr 24 10:59 s1-eth1_in.pcap
+-rw-r--r-- 1 root root    0 Apr 24 10:59 s1-eth1_out.pcap
+-rw-r--r-- 1 root root    0 Apr 24 10:59 s1-eth2_in.pcap
+-rw-r--r-- 1 root root    0 Apr 24 10:59 s1-eth2_out.pcap
+-rw-r--r-- 1 root root    0 Apr 24 10:59 s1-eth3_in.pcap
+-rw-r--r-- 1 root root    0 Apr 24 10:59 s1-eth3_out.pcap
+mininet> 
 ```
 
-s1-eth1_in.pcap is the log of packets that entered port 1 of switch s1. Since h1-eth0 is connected to s1-eth1, this is also the log of packets sent from host h1.
+s1-eth1_in.pcap is the log of packets that entered port 1 of switch s1. Since h1-eth0 is connected to s1-eth1, this also means that it is the log of packets sent from host h1.
 
-s1-eth1_out.pcap is the log of packets that left port 1 of switch s1. Similarly, this is the log of packets received by host h1.
+Similarly, s1-eth1_out.pcap is the log of packets that went out from port 1 of switch s1. Likewise, this means that it is the log of packets received by host h1.
 
-The same applies to s1-eth2 and s1-eth3, corresponding to communication with hosts h2 and h3. How to read the contents of these log files will be explained in the next step.
+Similarly, s1-eth2 and eth3 mean communication of hosts h2 and h3, respectively. How to view the contents of these log files will be explained in the next step.
 
-### Connecting P4Runtime Shell and Mininet
+Quite detailed switch behavior is recorded in bmv2-s1-log, but the details are not explained in this tutorial.
 
-In this state, start the P4Runtime Shell as follows. Specify the switch program to be sent to Mininet at startup. Note that the port2port_p4info.txtpb and port2port.json generated earlier are provided as options.
+### P4Runtime Shell
+
+#### Creating a working directory and copying files
+
+Create the /tmp/P4Runtime-protoswitch directory for work, and copy the P4 program groups in this tutorial.
 
 ```bash
-$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/port2port_p4info.txtpb,/tmp/port2port.json
+$ mkdir /tmp/P4Runtime-protoswitch
+$ cp -r proto0* /tmp/P4Runtime-protoswitch 
+$ ls /tmp/P4Runtime-protoswitch
+proto01	proto02	proto03
+$
+```
+
+#### Starting P4Runtime Shell and connecting to Mininet
+
+In this state, start P4 Runtime Shell as follows. Specify the switch program to be sent into Mininet at startup. Note that p4info.txtpb and proto01.json, which should exist under /tmp/proto01 as seen from the docker container, are given as options as the switch program to be sent.
+
+```bash
+$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/proto01/p4info.txtpb,/tmp/proto01/proto01.json
 *** Welcome to the IPython shell for P4Runtime ***
 P4Runtime sh >>>
 ```
+
+##### Notes for ARM Mac version
+
+If you got an error such as **"no matching manifest for linux/arm64/v8 in the manifest list entries"** or **"WARNING: The requested image's platform (linux/amd64) does not match ..."** in the above operation, are you using a Mac with an ARM processor? (Depending on the Docker version, more messages than those shown below may be displayed, such as "Run 'docker run --help' for more information", but the important part is **"no matching manifest for linux/arm64/v8"**.)
+
+```bash
+$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh ....
+....(snip)
+docker: Error response from daemon: no matching manifest for linux/arm64/v8 in the manifest list entries: no match for platform in manifest: not found
+$
+```
+
+To run P4C (and P4 Runtime Shell) on an ARM-based Mac, it is currently necessary to enable Rosetta. Check "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" in Dockerhub Settings >> General >> Virtual Machine Options. After that, it is probably good to add the platform option to the docker command, such as `$ docker run --platform=linux/amd64 ...`.
 
 #### When the target is not a local Docker container
 
@@ -171,17 +126,21 @@ When using a Docker container on the local host, host.docker.internal can be use
 
 #### When the connection to the switch is lost
 
-During experiments, you may see messages like the following:
+During experiments, messages such as the following may appear. This occurs when Mininet is terminated while connected with P4Runtime Shell, or when the network connection is lost for some reason.
 
 ```bash
 P4Runtime sh >>> CRITICAL:root:StreamChannel error, closing stream
 CRITICAL:root:P4Runtime RPC error (UNAVAILABLE): Socket closed
 ```
 
-This occurs when Mininet is terminated while connected to P4Runtime Shell, or when the network connection is otherwise interrupted.
+If this message is displayed, exit P4Runtime Shell once and reconnect to Mininet again. Otherwise, operations on the switch will not work.
 
-If this message appears, exit P4Runtime Shell and reconnect to Mininet. Otherwise, operations on the switch will not take effect.
+P4Runtime shell can be exited with the exit command.
 
+```
+P4Runtime sh >>> exit
+$
+```
 
 
 Now the environment is ready to send and receive packets. Let us proceed to the next step.

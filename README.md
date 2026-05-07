@@ -12,9 +12,9 @@ The code and data in this repository were created as a tutorial to provide a sim
 
 This tutorial performs the following three experiments:
 
-- Packet forwarding using only input port information
+- Packet forwarding using only ingress port information
 - Packet forwarding based on destination MAC address
-- Packet forwarding using match-action tables
+- Packet forwarding using a match-action tables
 
 These experiments are conducted in the following environment:
 
@@ -28,10 +28,6 @@ All of these are prepared to run in a Docker environment. At first, please use e
 
 All experiments in this tutorial are performed in a Docker environment.
 
-#### P4C
-
-- Docker Hub: [p4lang/p4c](https://hub.docker.com/r/p4lang/p4c) 
-
 #### P4Runtime-enabled Mininet Docker Image (modified)
 
 - Docker Hub: [yutakayasuda/p4mn](https://hub.docker.com/r/yutakayasuda/p4mn) 
@@ -43,13 +39,17 @@ The original [opennetworking/p4mn](https://hub.docker.com/r/opennetworking/p4mn)
 
 - Docker Hub:  [P4Runtime Shell](https://hub.docker.com/r/p4lang/p4runtime-sh)
 
+#### P4C
+
+- Docker Hub: [p4lang/p4c](https://hub.docker.com/r/p4lang/p4c) 
+
 ## Step by Step
 
 The steps are shown below. It is recommended to try them in order.
 
-### Tutorial 0: [Preparation of the experimental environment](t0_prepare.md)
+### Tutorial 0: [Preparing the experimental environment](t0_prepare.md)
 
-Before starting the experiments, you need to compile the P4 switch program. Then, start Mininet and connect the P4Runtime Shell, which acts as the controller.
+The experiments are performed by starting Mininet and connecting P4 Runtime Shell, which acts as the controller, to it.
 
 ### Tutorial 1: [The simplest switch](t1_port2port.md)
 
@@ -63,9 +63,13 @@ Here, we parse (interpret) headers and use a switch program, macaddr.p4, that de
 
 P4 has something called a Match-Action Table, which allows applying necessary processing (actions) per packet. Here, we use a switch program, tablematch.p4, where the forwarding destination is determined by a table keyed by destination MAC address.
 
+### Tutorial m: [Miscellaneous Topics](tm_misc.md)
+
+Here is some additional information for deeper learning, including how to compile your own P4 programs.
+
 ## Next Step
 
-This tutorial focuses on providing an easy-to-understand entry point without touching the internal structure. The next step would be to use this as a starting point and dig deeper into the internals. Below are some documents that I found particularly useful.
+This tutorial focuses on providing an easy-to-understand entry point without touching the P4 and P4Runtime internal structure. The next step would be to use this as a starting point and dig deeper into the internals. Below are some documents that I found particularly useful.
 
 - [P4Runtime Specification](https://p4.org/specifications/) v1.5.0 [[HTML](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html)] [[PDF](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.pdf)]
 - P4Runtime proto p4/v1/[p4runtime.proto](https://github.com/p4lang/p4runtime/blob/master/proto/p4/v1/p4runtime.proto) 

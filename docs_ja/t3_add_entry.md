@@ -1,6 +1,6 @@
 ## Tutorial 3: テーブルへのエントリ追加
 
-Tutorial 2 では転送先を決定する処理は P4 プログラム中にすべてハードコードされていました。しかし一般にスイッチやルータは内部に設定された表を調べることによって転送先を決定します。ここではパースして得たMACアドレスによって転送先を決定するスイッチプログラム、tablematch.p4 を試します。
+Tutorial 2 では転送先を決定する処理は P4 プログラム中にすべてハードコードされていました。しかし一般にスイッチやルータは内部に設定された表を調べることによって転送先を決定します。ここではパースして得たMACアドレスによって転送先を決定するスイッチプログラム、proto03.p4 を試します。
 
 ### Match Action Table 設定
 
@@ -8,7 +8,7 @@ P4 には Match Action Table と呼ばれるものがあり、これを使って
 
 <img src="../t3_table.png" alt="attach:(table entry)" title="Table Entry" width="350">
 
-このテーブルの形式について説明します。変数名や関数名については macaddr.p4 プログラム（後掲）と対照してください。
+このテーブルの形式について説明します。変数名や関数名については proto02.p4 プログラム（後掲）と対照してください。
 
 * テーブル名は "dmac_table" 
 * キーとなるフィールドは一つだけ、ethernet.dstAddr 型で用意
@@ -18,10 +18,10 @@ P4 には Match Action Table と呼ばれるものがあり、これを使って
 
 ### スイッチプログラムの切り替え
 
-Tutorial 2 で行ったのと同様に、今度は tablematch.p4 プログラムをコンパイルしたスイッチプログラムを Mininet に与えて動かします。コンパイルの手順などは Tutorial 2 の記述を見て下さい。以下は P4Runtime Shell を再起動したところです。
+Tutorial 2 で行ったのと同様に、今度は proto03.p4 プログラムをコンパイルしたスイッチプログラムを Mininet に与えて動かします。以下は P4Runtime Shell を再起動したところです。
 
 ```python
-$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/tablematch_p4info.txtpb,/tmp/tablematch.json
+$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/proto03/p4info.txtpb,/tmp/proto03/proto03.json
 *** Welcome to the IPython shell for P4Runtime ***
 P4Runtime sh >>>
 ```
@@ -150,7 +150,7 @@ mininet>
 
 ログファルを調べてみると、正しく転送されていることが観察できると思います。もちろん、テーブルに h3 用のエントリを追加すると h1 -> h3 の ping が通るようになります。
 
-### tablematch.p4 プログラムの内容
+### proto03.p4 プログラムの内容
 
 このようなパケットの転送が行われたのは、Mininet のスイッチに送り込まれたスイッチプログラムにそのようなパケット制御が書かれているからです。P4プログラムの内容を確認しましょう。
 

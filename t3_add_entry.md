@@ -1,32 +1,32 @@
-## Tutorial 3: Adding Entries to a Table
+## Tutorial 3: Adding entries to a table
 
-In Tutorial 2, the processing for determining the forwarding destination was entirely hard-coded in the P4 program. However, in general, switches and routers determine the forwarding destination by looking up tables configured internally. Here, we will try a switch program, `tablematch.p4`, which determines the forwarding destination based on the MAC address obtained through parsing.
+In Tutorial 2, the processing for determining the forwarding destination was all hardcoded in the P4 program. However, in general, switches and routers determine forwarding destinations by looking up internally configured tables. Here, we try the switch program `proto03.p4`, which determines the forwarding destination according to the MAC address obtained by parsing.
 
-### Match-Action Table Configuration
+### Match-Action Table configuration
 
 P4 has something called a Match-Action Table, which allows the necessary processing (actions) to be applied per packet. In this tutorial, we prepare a table as shown below.
 
 <img src="./t3_table.png" alt="attach:(table entry)" title="Table Entry" width="350">
 
-We explain the format of this table. Refer to the `macaddr.p4` program (shown later) for variable names and function names.
+We explain the format of this table. Refer to the `proto02.p4` program (shown later) for variable names and function names.
 
-* The table name is "dmac_table"  
-* There is only one key field, of type ethernet.dstAddr  
-* The action function is either forward() or drop()  
-* In the above figure, packets destined for 00:00:00:00:00:01 (h1) execute forward(1), and those for 00:00:00:00:00:02 (h2) execute forward(2)  
-* If no key matches, the drop() function is executed  
+* The table name is `"dmac_table"`
+* Only one key field is prepared, of type `ethernet.dstAddr`
+* The action function is set to either `forward()` or `drop()`
+* In the above figure, packets destined for `00:00:00:00:00:01` (h1) execute `forward(1)`, and packets destined for `00:00:00:00:00:02` (h2) execute `forward(2)`
+* If no key matches, the `drop()` function is executed
 
-### Changing the Switch Program
+### Changing the switch program
 
-As in Tutorial 2, we now run Mininet with a switch program compiled from `tablematch.p4`. Refer to Tutorial 2 for the compilation procedure. Below shows restarting the P4Runtime Shell.
+As was done in Tutorial 2, this time we run Mininet using the switch program compiled from `proto03.p4`. Below is the result of restarting P4Runtime Shell.
 
 ```python
-$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/tablematch_p4info.txtpb,/tmp/tablematch.json
+$ docker run -ti -v /tmp/P4runtime-protoswitch:/tmp p4lang/p4runtime-sh --grpc-addr host.docker.internal:50001 --device-id 1 --election-id 0,1 --config /tmp/proto03/p4info.txtpb,/tmp/proto03/proto03.json
 *** Welcome to the IPython shell for P4Runtime ***
 P4Runtime sh >>>
 ```
 
-### Table Processing
+### Table processing
 
 #### Checking existing tables and their definitions
 
@@ -64,7 +64,7 @@ P4Runtime sh >>>
 
 #### Inserting entries
 
-Set the key and action for h1 in the table. Set various parameters (destination MAC address "00:00:00:00:00:01", action function forward(1)) into a Table Entry instance (variable name `te`), and simply call `te.insert()`.
+Set the key and action for h1 in the table. Set various parameters (destination MAC address `"00:00:00:00:00:01"`, action function forward(1)) into a Table Entry instance (variable name `te`), and simply call `te.insert()`.
 
 ```python
 P4Runtime sh >>> te = table_entry["MyIngress.dmac_table"](action="MyIngress.forward")
@@ -153,9 +153,9 @@ mininet>
 
 If you examine the log files, you will observe that packets are forwarded correctly. Of course, if you add an entry for h3 to the table, ping from h1 to h3 will also succeed.
 
-### Contents of the tablematch.p4 Program
+### Contents of the `proto03.p4` program
 
-Such packet forwarding occurs because that kind of packet control is written in the switch program sent to the Mininet switch. Let us examine the contents of the P4 program.
+Such packet forwarding took place because such packet forwarding control is written in the switch program sent to the Mininet switch. Let us examine the contents of the P4 program.
 
 #### Table definition
 
@@ -199,11 +199,13 @@ control MyIngress(inout headers hdr, inout metadata meta,
 ### Reference: Deleting entries
 
 You could display all registered entries as follows:
+
 ```bash
 P4Runtime sh >>> table_entry["MyIngress.dmac_table"].read(lambda a: print(a))
 ```
 
 Similarly, you can delete all registered entries as follows:
+
 ```bash
 P4Runtime sh >>> table_entry["MyIngress.dmac_table"].read(lambda a: a.delete())
 ```
